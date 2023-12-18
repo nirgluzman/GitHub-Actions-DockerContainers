@@ -11,13 +11,13 @@ jobs:
   test:
     environment: testing
     runs-on: ubuntu-latest
-    container: # running the job in a container
-      image: node:16
-      # env: ... # environment variables needed to run the image
+    # container: # running the job in a container
+    #   image: node:16
+    #   # env: ... # environment variables needed to run the image
     env:
       MONGODB_CONNECTION_PROTOCOL: mongodb
-      MONGODB_CLUSTER_ADDRESS: mongodb # as the job is running in a container we can use Docker network to connect with MongoDB test container by name.
-      MONGODB_USERNAME: root # mongodb service cerdentials
+      MONGODB_CLUSTER_ADDRESS: 127.0.0.1:27017 # we should use 'mongodb' if 'test' job is running in a container (we leverage Docker network).
+      MONGODB_USERNAME: root # mongodb service credentials
       MONGODB_PASSWORD: example
       PORT: 8080
 
@@ -26,6 +26,8 @@ jobs:
       # We run this MongoDB container for testing purposes only during the workflow period. It will not be online after the workflow finishes.
       mongodb: # https://hub.docker.com/_/mongo?tab=tags
         image: mongo
+        ports:
+          - 27017:27017 # we must expose the port if 'test' job is not running in a container.
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: example
